@@ -1,0 +1,26 @@
+Usage:  ./nextract_plus.py version 41
+./nextract_plus.py filename.json - use the JSON file to find the parameters
+Example config.json
+{
+"hmc_hostname": "hmc15",
+"hmc_user": "pcmadmin",
+"hmc_password": "panda123sausages!",
+"output_nchart": 0,
+"output_json": 0",
+"output_csv": 0,
+"comment1": "Valid setting for output_influx = 0 (off), 1 or 2",
+"output_influx": 1,
+"comment2": "InfluxDB 1.x options",
+"ihost": "myinflux",
+"iport": "8086",
+"idbname": "nextractplus",
+"iuser": "fred",
+"ipassword": "blogs",
+"comment3": "InfluxDB 2.x options",
+"iurl": "https://influx.acme.com:8086",
+"ibucket": "default",
+"iorg": "IBM",
+"itoken": "123456780..abcdefg_etc.",
+"comment4": "other parameters are ignored",
+"comment5": "last name=value line has no ending comma"
+}
