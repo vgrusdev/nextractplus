@@ -203,6 +203,8 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                 print("Server stats: %s"%(servername))
 
             entry=[]
+            mtms=[]
+            mtms = info['mtms'].split('*',1)
 
             for sample in utilSamplesArray:
                 timestamp = sample['sampleInfo']['timeStamp']
@@ -210,6 +212,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                 try:
                   fields = extract_data(sample['systemFirmwareUtil'])
                   fields['mtm'] = info['mtms']
+                  fields['mtype'] = mtms[0]
                   fields['name'] = servername
                   fields['APIversion'] = info['version']
                   fields['metric'] = info['metricType']
@@ -217,7 +220,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                   fields['nextract'] = str(version)
 
                   data = { 'measurement': 'server_details', 'time': timestamp,
-                      'tags': { 'servername': servername },
+                      'tags': { 'servername': servername, 'serial': mtms[1] },
                       'fields':fields }
                   entry.append(data)
                 except:
@@ -225,7 +228,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
 
                 try:
                   data = { 'measurement': 'server_processor', 'time':timestamp,
-                      'tags': { 'servername': servername },
+                      'tags': { 'servername': servername, 'serial': mtms[1] },
                       'fields': extract_data(sample['serverUtil']['processor']) }
                   entry.append(data)
                 except:
@@ -233,7 +236,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
 
                 try:
                   data = { 'measurement': 'server_memory', 'time': timestamp,
-                      'tags': { 'servername': servername },
+                      'tags': { 'servername': servername, 'serial': mtms[1] },
                       'fields': extract_data(sample['serverUtil']['memory']) }
                   entry.append(data)
                 except:
@@ -241,7 +244,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
 
                 try:
                   data = { 'measurement': 'server_physicalProcessorPool', 'time': timestamp,
-                      'tags': { 'servername': servername },
+                      'tags': { 'servername': servername, 'serial': mtms[1] },
                       'fields': extract_data(sample['serverUtil']['physicalProcessorPool']) }
                   entry.append(data)
                 except:
@@ -251,7 +254,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                   arr = sample['serverUtil']['sharedMemoryPool']
                   for pool in arr:
                       data = { 'measurement': 'server_sharedMemoryPool', 'time': timestamp,
-                          'tags': { 'servername': servername, 'pool':pool['id'] },
+                          'tags': { 'servername': servername, 'serial': mtms[1], 'pool':pool['id'] },
                           'fields': extract_data(pool) }
                       entry.append(data)
                 except:
@@ -260,7 +263,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                 try:
                   for pool in sample['serverUtil']['sharedProcessorPool']:
                       data = { 'measurement': 'server_sharedProcessorPool', 'time': timestamp,
-                          'tags': { 'servername': servername, 'pool':pool['id'], 'poolname':pool['name'] },
+                          'tags': { 'servername': servername, 'serial': mtms[1], 'pool':pool['id'], 'poolname':pool['name'] },
                           'fields': extract_data(pool) }
                       entry.append(data)
                 except:
@@ -270,7 +273,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                   for adapter in sample['serverUtil']['network']['sriovAdapters']:
                       for adaptport in adapter['physicalPorts']:
                           data = { 'measurement': 'server_sriov', 'time': timestamp,
-                              'tags': { 'servername': servername, 
+                              'tags': { 'servername': servername, 'serial': mtms[1], 
                                         'port': adaptport['id'], 
                                         'location': adaptport['physicalLocation'] },
                               'fields': extract_data(adaptport) }
@@ -282,7 +285,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                   for HEA in sample['serverUtil']['network']['HEAdapters']['physicalPorts']:
                       for HEAport in HEA:
                           data = { 'measurement': 'server_HEAport', 'time': timestamp, 
-                              'tags': { 'servername': servername, 
+                              'tags': { 'servername': servernamei, 'serial': mtms[1], 
                                          'port': HEAport['id'], 
                                          'location': HEAport['physicalLocation'] }, 
                               'fields': extract_data(HEAport) }
@@ -300,7 +303,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                   try:
                     for vios in vios_array:
                        data = { 'measurement': 'vios_details', 'time': timestamp,
-                            'tags': { 'servername': servername, 'viosname': vios['name']}, 
+                            'tags': { 'servername': servername, 'serial': mtms[1], 'viosname': vios['name']}, 
                             'fields':{'viosid': vios['id'],'viosname': vios['name'],
                                     'viosstate': vios['state'], 'affinityScore': vios['affinityScore']} }
                        entry.append(data)
@@ -310,7 +313,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                   try:
                     for vios in vios_array:
                        data = { 'measurement': 'vios_memory', 'time': timestamp,
-                            'tags': { 'servername': servername, 'viosname': vios['name']}, 
+                            'tags': { 'servername': servername, 'serial': mtms[1], 'viosname': vios['name']}, 
                             'fields': extract_data(vios['memory']) }
                        entry.append(data)
                   except:
@@ -320,7 +323,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                     for vios in vios_array:
                        data = { 'measurement': 'vios_processor', 
                             'time': sample['sampleInfo']['timeStamp'],
-                            'tags': { 'servername': servername, 'viosname': vios['name']}, 
+                            'tags': { 'servername': servername, 'serial': mtms[1], 'viosname': vios['name']}, 
                             'fields': extract_data(vios['processor']) }
                        entry.append(data)
                   except:
@@ -331,7 +334,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                     for vios in vios_array:
                        length = len(vios['network']['clientLpars']) 
                        data = { 'measurement': 'vios_network_lpars', 'time': timestamp,
-                            'tags': { 'servername': servername, 'viosname': vios['name'] },
+                            'tags': { 'servername': servername, 'serial': mtms[1], 'viosname': vios['name'] },
                             'fields':{ 'clientlpars': length } }
                        entry.append(data)
                   except:
@@ -341,7 +344,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                     for vios in vios_array:
                        for adapt in vios['network']['genericAdapters']:
                          data = { 'measurement': 'vios_network_generic', 'time': timestamp,
-                            'tags': { 'servername': servername, 'viosname': vios['name'], 
+                            'tags': { 'servername': servername, 'serial': mtms[1], 'viosname': vios['name'], 
                                       'id': adapt['id'], 'location': adapt['physicalLocation']}, 
                             'fields': extract_data(adapt) }
                          entry.append(data)
@@ -352,7 +355,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                     for vios in vios_array:
                        for adapt in vios['network']['sharedAdapters']:
                          data = { 'measurement': 'vios_network_shared', 'time': timestamp,
-                            'tags': { 'servername': servername, 'viosname': vios['name'], 
+                            'tags': { 'servername': servername, 'serial': mtms[1], 'viosname': vios['name'], 
                                       'id': adapt['id'], 'location': adapt['physicalLocation']}, 
                             'fields': extract_data(adapt) }
                          entry.append(data)
@@ -363,7 +366,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                     for vios in vios_array:
                        for adapt in vios['network']['virtualEthernetAdapters']:
                          data = { 'measurement': 'vios_network_virtual', 'time': timestamp,
-                            'tags': { 'servername': servername, 'viosname': vios['name'], 
+                            'tags': { 'servername': servername, 'serial': mtms[1], 'viosname': vios['name'], 
                                       'location': adapt['physicalLocation'], 
                                       'vswitchid': adapt['vswitchId'], 
                                       'vlanid': adapt['vlanId'] }, 
@@ -376,7 +379,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                     for vios in vios_array:
                        for adapt in vios['network']['sriovLogicalPorts']:
                          data = { 'measurement': 'vios_network_sriov', 'time': timestamp,
-                            'tags': { 'servername': servername, 'viosname': vios['name'],
+                            'tags': { 'servername': servername, 'serial': mtms[1], 'viosname': vios['name'],
                                       'location': adapt['physicalLocation'], 
                                       'physicalPortId': adapt['physicalPortId'] }, 
                             'fields': extract_data(adapt) }
@@ -389,7 +392,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                     for vios in vios_array:
                        length = len(vios['storage']['clientLpars']) 
                        data = { 'measurement': 'vios_storage_lpars', 'time': timestamp,
-                            'tags': { 'servername': servername, 'viosname': vios['name'] },
+                            'tags': { 'servername': servername, 'serial': mtms[1], 'viosname': vios['name'] },
                             'fields':{ 'clientlpars': length } }
                        entry.append(data)
                   except:
@@ -399,7 +402,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                     for vios in vios_array:
                        for adapt in vios['storage']['genericVirtualAdapters']:
                          data = { 'measurement': 'vios_storage_virtual', 'time': timestamp,
-                            'tags': { 'servername': servername, 'viosname': vios['name'],
+                            'tags': { 'servername': servername, 'serial': mtms[1], 'viosname': vios['name'],
                                       'id': adapt['id'], 'location': adapt['physicalLocation']}, 
                             'fields': extract_data(adapt) }
                          entry.append(data)
@@ -410,7 +413,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                     for vios in vios_array:
                        for adapt in vios['storage']['genericPhysicalAdapters']:
                          data = { 'measurement': 'vios_storage_physical', 'time': timestamp,
-                            'tags': { 'servername': servername, 'viosname': vios['name'], 
+                            'tags': { 'servername': servername, 'serial': mtms[1], 'viosname': vios['name'], 
                                       'id': adapt['id'], 'location': adapt['physicalLocation']}, 
                             'fields': extract_data(adapt) }
                          entry.append(data)
@@ -421,7 +424,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                     for vios in vios_array:
                        for adapt in vios['storage']['fiberChannelAdapters']:
                          data = { 'measurement': 'vios_storage_FC', 'time': timestamp,
-                            'tags': { 'servername': servername, 'viosname': vios['name'], 
+                            'tags': { 'servername': servername, 'serial': mtms[1], 'viosname': vios['name'], 
                                       'id': adapt['id'], 'location': adapt['physicalLocation']}, 
                             'fields': extract_data(adapt) }
                          entry.append(data)
@@ -432,7 +435,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                     for vios in vios_array:
                        for adapt in vios['storage']['sharedStoragePools']:
                          data = { 'measurement': 'vios_storage_SSP', 'time': timestamp,
-                            'tags': { 'servername': servername, 'viosname': vios['name'],
+                            'tags': { 'servername': servername, 'serial': mtms[1], 'viosname': vios['name'],
                                       'id': adapt['id']}, 
                             'fields': extract_data(adapt) }
                          entry.append(data)
@@ -474,6 +477,9 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
             print('----> LPAR=%s' %(lparname))
             errorlist = {'error'}
 
+            mtms=[]
+            mtms = jdata["systemUtil"]["utilInfo"]['mtms'].split('*',1)
+
             for sample in jdata['systemUtil']['utilSamples']:
                 errors = 0
                 samplestatus = sample['sampleInfo']['status']
@@ -505,7 +511,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                     
                     try:
                       data = { 'measurement': 'lpar_details', 'time': sampletime,
-                          'tags': { 'servername': servername, 'lparname': lparname },
+                              'tags': { 'servername': servername, 'serial': mtms[1], 'lparname': lparname },
                           'fields': {
                                 "id": lpar['id'],
                                 "name": lpar['name'],
@@ -519,7 +525,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
 
                     try:
                       data = { 'measurement': 'lpar_processor', 'time': sampletime,
-                          'tags': { 'servername': servername, 'lparname': lparname },
+                          'tags': { 'servername': servername, 'serial': mtms[1], 'lparname': lparname },
                           'fields': extract_data(lpar['processor']) }
                       entry.append(data)
                     except:
@@ -527,7 +533,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
 
                     try:
                       data = { 'measurement': 'lpar_memory', 'time': sampletime,
-                          'tags': { 'servername': servername, 'lparname': lparname },
+                          'tags': { 'servername': servername, 'serial': mtms[1], 'lparname': lparname },
                           'fields': extract_data(lpar['memory']) }
                       entry.append(data)
                     except:
@@ -542,7 +548,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                         for net in lpar['network']['virtualEthernetAdapters']:
                             try:
                                 data = { 'measurement': 'lpar_net_virtual', 'time': sampletime,
-                                    'tags': { 'servername': servername, 'lparname': lparname,
+                                    'tags': { 'servername': servername, 'serial': mtms[1], 'lparname': lparname,
                                               'location': net['physicalLocation'],
                                               'vlanId': net['vlanId'], 
                                               'vswitchId': net['vswitchId'] },
@@ -558,7 +564,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                             if debug: print(net)
                             try:
                                 data = { 'measurement': 'lpar_network_sriov', 'time': sampletime,
-                                    'tags': { 'servername': servername, 'lparname': lparname,
+                                    'tags': { 'servername': servername, 'serial': mtms[1], 'lparname': lparname,
                                               'location': net['physicalLocation'],
                                               'physicalPortId': net['physicalPortId'] },
                                     'fields': extract_data(net) }
@@ -574,7 +580,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                         for store in lpar['storage']['genericVirtualAdapters']:
                             try:
                                 data = { 'measurement': 'lpar_storage_virtual', 'time': sampletime,
-                                    'tags': { 'servername': servername, 'lparname': lparname,
+                                    'tags': { 'servername': servername, 'serial': mtms[1], 'lparname': lparname,
                                               'id': store['id'], 
                                               'location': net['physicalLocation'],
                                               'viosId': store['viosId'] },
@@ -589,7 +595,7 @@ for count, server in enumerate(perflist,start=1):  # just loop the servers with 
                         for store in lpar['storage']['virtualFiberChannelAdapters']:
                             try:
                                 data = { 'measurement': 'lpar_storage_vFC', 'time': sampletime,
-                                    'tags': { 'servername': servername, 'lparname': lparname,
+                                    'tags': { 'servername': servername, 'serial': mtms[1], 'lparname': lparname,
                                               'location': store['physicalLocation'], 
                                               'viosId': store['viosId'] },
                                     'fields': extract_data(store) }
